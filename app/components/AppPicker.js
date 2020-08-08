@@ -19,12 +19,21 @@ import {
 import Screen from "./Screen";
 import PickerItem from "./PickerItem";
 
-function AppPicker({ icon, items, placeholder, onSelectItem, selectedItem }) {
+function AppPicker({
+  icon,
+  items,
+  numberOfColumns = 1,
+  placeholder,
+  onSelectItem,
+  selectedItem,
+  PickerItemComponent = PickerItem,
+  width = "100%",
+}) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <>
       <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
-        <View style={styles.container}>
+        <View style={[styles.container, { width }]}>
           {icon && (
             <MaterialCommunityIcons
               name={icon}
@@ -33,9 +42,11 @@ function AppPicker({ icon, items, placeholder, onSelectItem, selectedItem }) {
               style={styles.icon}
             />
           )}
-          <AppText style={styles.text}>
-            {selectedItem ? selectedItem.label : placeholder}
-          </AppText>
+          {selectedItem ? (
+            <AppText style={styles.text}>{selectedItem.label}</AppText>
+          ) : (
+            <AppText style={styles.placeholder}>{placeholder}</AppText>
+          )}
           <MaterialCommunityIcons
             name="chevron-down"
             size={20}
@@ -49,9 +60,11 @@ function AppPicker({ icon, items, placeholder, onSelectItem, selectedItem }) {
           <FlatList
             data={items}
             keyExtractor={(item) => item.value.toString()}
+            numColumns={numberOfColumns}
             renderItem={({ item }) => (
-              <PickerItem
+              <PickerItemComponent
                 label={item.label}
+                item={item}
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);
@@ -70,7 +83,6 @@ const styles = StyleSheet.create({
     backgroundColor: defaultStyles.colors.light,
     borderRadius: 25,
     flexDirection: "row",
-    width: "100%",
     padding: 15,
     marginVertical: 10,
   },
@@ -78,6 +90,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   text: {
+    flex: 1,
+  },
+  placeholder: {
+    color: defaultStyles.colors.medium,
     flex: 1,
   },
 });
